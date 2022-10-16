@@ -1,1 +1,1 @@
-# Obliczenia-Naukowe
+# Obliczenia Naukowe
