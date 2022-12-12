@@ -1,3 +1,5 @@
+#Autor: Piotr Zapała nr.indeksu 261712
+
 using Polynomials
 
 function polynomials(coefficient)
@@ -12,6 +14,7 @@ function calculateTheValue(coefficientFormOfPolynomial, productFormOfPolynomial,
     p1 = coefficientFormOfPolynomial
     p2 = productFormOfPolynomial
     r1 = RootsOfCoefficientForm
+    #r2 = RootsOfProductForm
     r2 = collect(1.0:20.0)
     valuesOfCoefficientForm = map(x -> abs(p1(x)), r1)
     valuesOfProductForm = map(x -> abs(p2(x)), r1)

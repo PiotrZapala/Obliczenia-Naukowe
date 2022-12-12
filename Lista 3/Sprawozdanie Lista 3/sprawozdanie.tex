@@ -1,0 +1,362 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{fancyhdr}
+\usepackage{polski}
+\usepackage{mathtools}
+\usepackage{ulem}
+\usepackage[margin = 1cm]{geometry}
+\usepackage{hhline}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{colortbl}
+\usepackage{longtable}
+\usepackage{mathdots}
+\usepackage{multirow}
+\usepackage{centernot}
+\usepackage{tensor}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{enumitem}
+\usepackage{amsthm}
+\usepackage{mathabx}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{pgfplots}
+
+
+\title{Sprawozdanie Obliczenia Naukowe}
+\author{Piotr Zapała}
+\date{November 2022}
+\begin{document}
+\maketitle
+
+\tableofcontents
+\newpage
+\begin{center}
+    \section{Zadanie 1}
+    \subsection{Opis problemu}
+    \large W zadaniu pierwszym należy napisać funkcję rozwiązującą równanie \(f(x) = 0\) metodą bisekcji. \newline
+     \texttt{function mbisekcji(f::Function, a::Float64, b::Float64, delta::Float64, epsilon::Float64)} 
+     \begin{flushleft}
+        Dla następujących danych wejściowych: \newline
+        \texttt{f} - funkcja \(f(x)\) zadana jako anonimowa funkcja, \newline
+        \texttt{a, b} - końce przedziału początkowego, \newline
+        \texttt{delta, epsilon} - dokładność obliczeń, \newline
+        \newline
+        Nasza funkcja powinna zwracać następujące parametry: \newline
+        \texttt{r} - przybliżenie pierwiastka równania \(f(x) = 0\), \newline
+        \texttt{v} - wartość \(f(r)\), \newline
+        \texttt{it} - liczba wykonanych iteracji, \newline
+        \texttt{err} - sygnalizacja błędu (\textbf{0} - brak błędu, \textbf{1} - funkcja nie zmienia znaku w przedziale \([a, b]\)), \newline
+     \end{flushleft}
+     Metoda bisekcji, czyli inaczej metoda połowienia przedziału, jest konsekwencją własności Darboux dla funkcji ciągłych.
+     Jeśli f jest funkcją ciągłą w przedziale \([a, b]\) i jeśli \(f(a)f(b) < 0\), a więc f zmienia znak w \([a, b]\),
+     to ta funkcja musi mieć zero w \((a, b)\). Zatem jeśli \(f(a)f(b) < 0\), to obliczamy \(c = \frac{1}{2}(a + b)\)
+     i sprawdzamy, czy \(f(a)f(c) < 0\). Jeśli tak, to f ma zero w \([a, c]\); wtedy pod \(b\) podstawiamy \(c\).
+     W przeciwnym razie jest \(f(c)f(b) < 0\); wtedy pod \(a\) podstawiamy \(c\). W obu przypadkach nowy przedział \([a, b]\), 
+     dwa razy krótszy od poprzedniego, zawiera zero funkcji f, zatem postępowanie można powtórzyć. Jeśli \(f(a)f(c) = 0\), to \(f(c) = 0\) i zero zostało znalezione.
+     Jednakże z powodu błędów zaokrągleń, sytuacja gdzie \(f(c) = 0\), jest mało prawdopodobna i nie powinna stanowić kryterium zakończenia obliczeń.
+     Należy więc dopuścić pewną tolerancję wyników, przykładowo \(|f(c)| < 10^{-5}\), gdy precyzja arytmetyki wynosi \(\epsilon = 2^{-24}\).
+
+    \subsection{Rozwiązanie}
+    \large Aby rozwiązać zadanie pierwsze należało zaimplementować w języku \texttt{Julia} następujący algorytm. 
+    \begin{flushleft}
+        \begin{algorithm}
+            \caption{Algorytm Bisekcji}\label{alg:bisekcji}
+            \begin{algorithmic}
+                \Function{mbisekcji}{$f, a, b, \delta, \epsilon$}
+                \State$it \gets 0$
+                \State$u \gets f(a)$
+                \State$v \gets f(b)$
+                \State$e \gets (b - a)$
+                \If{$sgn(u)==sgn(v)$}
+                \Return{$(0, 0 , it, 1)$}
+                \EndIf
+                \While{$true$}
+                    \State$it \gets it + 1$
+                    \State$e \gets e/2$
+                    \State$c \gets a + e$
+                    \State$w \gets f(c)$
+                    \If{$|e| < \delta$ or $|w| < \epsilon$}
+                    \Return{$(c, w , it, 0)$}
+                    \EndIf
+                    \If{$sgn(u) \ne sgn(v)$}
+                        \State$b \gets c$
+                        \State$v \gets w$
+                    \Else
+                        \State$a \gets c$
+                        \State$u \gets w$
+                    \EndIf
+                \EndWhile
+                \EndFunction
+            \end{algorithmic}
+        \end{algorithm}
+    \end{flushleft}
+
+    \section{Zadanie 2}
+    \subsection{Opis problemu}
+    \large W zadaniu drugim należy napisać funkcję rozwiązującą równanie \(f(x) = 0\) metodą stycznych. \newline
+    \texttt{function mstycznych(f::Function, pf::Function, x0::Float64, delta::Float64, epsilon::Float64, maxit::Int)} \newline
+    \begin{flushleft}
+       Dla następujących danych wejściowych: \newline
+       \texttt{f, pf} - funkcją \(f(x)\) oraz pochodną \(f'(x)\) zadane jako anonimowe funkcje, \newline
+       \texttt{x0} - przybliżenie początkowe, \newline
+       \texttt{delta, epsilon} - dokładność obliczeń, \newline
+       \texttt{maxit} - maksymalna dopuszczalna liczba iteracji, \newline
+       \newline
+       Nasza funkcja powinna zwracać następujące parametry: \newline
+       \texttt{r} - przybliżenie pierwiastka równania \(f(x) = 0\), \newline
+       \texttt{v} - wartość \(f(r)\), \newline
+       \texttt{it} - liczba wykonanych iteracji, \newline
+       \texttt{err} - sygnalizacja błędu (\textbf{0} - metoda zbieżna, \textbf{1} - nie osiągnięto wymaganej dokładności w \texttt{maxit} iteracji, \textbf{2} - pochodna bliska zeru), \newline
+    \end{flushleft}
+    Metoda stycznych, czyli inaczej metoda Newtona, na ogół szybsza od metody bisekcji i siecznych, ponieważ jej zbieżność jest kwadratowa.
+    Gdy tylko przybliżenia tworzone metodą Newtona są dostatecznie bliskie pierwiastka, staje się szybko zbieżna i zaledwie pare kolejnych iteracji daje już maksymalną dokładność.
+    Niech \(r\) będzie takim zerem, a \(x\) jego przybliżeniem, Jeśli \(f''\) istnieje, to na mocy twierdzenia \textbf{Taylora}.
+    \[0 = f(r) = f(x + h) = f(x) + hf'(x) + O(h^2)\] \newline
+    gdzie \(h = r - x\). Jeśli \(h\) jest małe, to możemy pominąć składnik \(O(h^2)\) i rozwiązać otrzymane równanie względem \(h\).
+    Otrzymujemy \(h = -f(x)/f'(x)\). Zatem jeśli \(x\) jest przybliżeniem \(r\), to \(x - f(x)/f'(x)\) powinno być lepszym przybliżeniem tego zera.
+    Skąd metoda Newtona polega na rekurencyjnym stosowaniu wzoru. 
+    \[x_{n+1} := x_{n} - \frac{f(x_{n})}{f'(x_{n})}\] 
+    \subsection{Rozwiązanie}
+    \large Aby rozwiązać zadanie drugie należało zaimplementować w języku \texttt{Julia} następujący algorytm. 
+    \begin{flushleft}
+        \begin{algorithm}
+            \caption{Algorytm Newtona}\label{alg:stycznych}
+            \begin{algorithmic}
+                \Function{mstycznych}{$f, pf, x0, \delta, \epsilon, maxit$}
+                \State$v \gets f(x0)$
+                \If{$|v| < \epsilon$}
+                \Return{$(x0, v, 0, 0)$}
+                \EndIf
+                \If{$|pf(x0)| < \epsilon$}
+                \Return{$(0, 0, 0, 2)$}
+                \EndIf
+                \For{$i \gets 1,\, maxit$}
+                    \State$x1 \gets x0 - v/pf(x0)$
+                    \State$v \gets f(x1)$
+                    \If{$|x1 - x0| < \delta$ or $|v| < \epsilon$}
+                    \Return{$(x1, v , i, 0)$}
+                    \EndIf
+                    \State$x0 \gets x1$
+                \EndFor
+                \EndFunction
+            \end{algorithmic}
+        \end{algorithm}
+    \end{flushleft}
+
+    \section{Zadanie 3}
+    \subsection{Opis problemu}
+    \large W zadaniu trzecim należy napisać funkcję rozwiązującą równanie \(f(x) = 0\) metodą siecznych. \newline
+    \texttt{function msiecznych(f::Function, x0::Float64, x1::Float64, delta::Float64, epsilon::Float64, maxit::Int)} \newline
+    \begin{flushleft}
+       Dla następujących danych wejściowych: \newline
+       \texttt{f} - funkcja \(f(x)\) zadana jako anonimowa funkcja, \newline
+       \texttt{x0, x1} - przybliżenia początkowe, \newline
+       \texttt{delta, epsilon} - dokładność obliczeń, \newline
+       \texttt{maxit} - maksymalna dopuszczalna liczba iteracji, \newline
+       \newline
+       Nasza funkcja powinna zwracać następujące parametry: \newline
+       \texttt{r} - przybliżenie pierwiastka równania \(f(x) = 0\), \newline
+       \texttt{v} - wartość \(f(r)\), \newline
+       \texttt{it} - liczba wykonanych iteracji, \newline
+       \texttt{err} - sygnalizacja błędu (\textbf{0} - metoda zbieżna, \textbf{1} - nie osiągnięto wymaganej dokładności w \texttt{maxit} iteracji), \newline
+    \end{flushleft}
+    Jedną z wad metody Newtona jest konieczność obliczania wartości pochodnej funkcji \(f\), której zera szukamy.
+    W celu umienięcia tego problemu \textbf{Johan Frederik Steffensen} zaproponował następujący wzór
+    \[x_{n+1} := x_{n} - \frac{[f(x_{n})]^2}{f(x_{n} + f(x_{n})) - f(x_{n})}\] \newline
+    Aby osiągnąć ten sam efekt również można się posłużyć wzorem na iloraz różnicowy.
+    \[f'(x_{n}) \approx \frac{f(x_{n}) - f(x_{n-1})}{x_{n} - x_{n-1}}\] \newline
+    Powyższa przybliżona równość, bezpośrednio daje nam metodę siecznych opisaną poniższym wzorem.
+    \[x_{n+1} := x_{n} - f(x_{n})\frac{x_{n} - x_{n+1}}{f(x_{n}) - f(x_{n-1})} \quad (n \geqslant 1)\]
+    \includegraphics[width=100mm]{sieczna.png}
+    \subsection{Rozwiązanie}
+    \large Aby rozwiązać zadanie trzecie należało zaimplementować w języku \texttt{Julia} następujący algorytm. 
+    \begin{flushleft}
+        \begin{algorithm}
+            \caption{Algorytm siecznych}\label{alg:siecznych}
+            \begin{algorithmic}
+                \Function{msiecznych}{$f, x0, x1, \delta, \epsilon, maxit$}
+                \State $fa \gets f(x0)$
+                \State $fb \gets f(x1)$
+                \For{$i \gets 1,\, maxit$}
+                    \If{$|fa| > |fb|$}
+                    \State$x0 \leftrightarrow x1$
+                    \State$fa \leftrightarrow fb$
+                    \EndIf
+                    \State$s \gets (x1 - x0)/(fb - fa)$
+                    \State$x1 \gets x0$
+                    \State$fb \gets fa$
+                    \State$x0 \gets x0 - (fa * s)$
+                    \State$fa \gets f(x0)$
+                    \If{$|fa| < \epsilon$ or $|x1 - x0| < \delta$}
+                    \Return{$(x0, fa, i, 0)$}
+                    \EndIf
+                \EndFor \newline
+                \Return{$(0, 0, 0, 1)$}
+                \EndFunction
+            \end{algorithmic}
+        \end{algorithm}
+    \end{flushleft}
+    
+    \section{Zadanie 4}
+    \subsection{Opis problemu}
+    \large W zadaniu czwartym, należało wyznaczyć pierwiastki równania \(\sin(x) - (\frac{1}{2}x)^2 = 0\),
+     za pomocą metod zaimplementowanych w poprzednich zadaniach.\newline
+     \newline
+     \begin{flushleft}
+        1. metoda bisekcji z przedziałem początkowym \([1.5,2]\) oraz dokładnością obliczeń \(\delta = \frac{1}{2}10^{-5}\), \(\epsilon = \frac{1}{2}10^{-5}\) \newline
+        2. metoda Newtona z przybliżeniem początkowym \(x_{0} = 1.5\) oraz dokładnością obliczeń \(\delta = \frac{1}{2}10^{-5}\), \(\epsilon = \frac{1}{2}10^{-5}\) \newline
+        3. metoda siecznych z przybliżeniami początkowymi \(x_{0} = 1\), \(x_{1} = 2\) oraz dokładnością \(\delta = \frac{1}{2}10^{-5}\), \(\epsilon = \frac{1}{2}10^{-5}\)
+     \end{flushleft}
+     Powyższe równanie posiada dwa miejsca zero, \(x=0\) oraz \(x \approx 1.93375\) 
+    \subsection{Rozwiązanie}
+    \large W celu rozwiązania powyższych przykładów, należało zaimplementować program testujący, który wykorzystuje funkcje z modułu napisanego w zadaniach 1-3.
+    \subsection{Wyniki}
+    \begin{table}[h!]
+        \centering
+        \begin{tabular}{||c c c c||} 
+        \hline
+        \textbf{algorytm} & \textbf{x} & \textbf{f(x)} & \textbf{iteracje} \\ [0.5ex]
+        \hline\hline
+         bisekcji & 1.9337539672851562  & -2.7027680138402843e-7 & 16 \\
+         Newtona & 1.933753779789742 & -2.2423316314856834e-8 & 4 \\
+         siecznych & 1.933753644474301 & 1.564525129449379e-7 & 4 \\
+        \hline
+        \end{tabular}
+        \caption{Zadanie 4}
+        \label{table:1}
+    \end{table} 
+    
+    \subsection{Wnioski}
+    \large Jak widzimy z powyższej tabeli, nasze metody z powodzeniem zwracają poprawne wyniki równania \(\sin(x) - (\frac{1}{2}x)^2 = 0\).
+     Przy okazji analizowania tego typu doświadczenia, należy zwrócić uwagę na kwestie liczby iteracji. Wyniki wskazują same za siebie,
+     metoda Newtona oraz metoda siecznych są szybciej zbieżne od metody bisekcji. Przy okazji opisu zadania drugiego nadmnieniłem,
+     że metoda Newtona jest szybsza od metody bisekcji, gdyż w przypadku tej pierwszej zbieżność jest kwadratowa, a nie liniowa bądź nadliniowa.
+     Nasze wyniki faktycznie potwierdzają fakt dotyczący zbieżności użytych metod.
+    \section{Zadanie 5}
+    \subsection{Opis problemu}
+     \large W zadaniu piątym jesteśmy proszeni o to, aby użyć metody bisekcji do wyznaczenia
+      punktu przecięcia wykresów następujących funkcji \(y = 3x\) oraz \(y = e^x\). 
+      Dodatkowo należało zachować następujące dokładności obliczeń \(\delta = 10^{-4}\) oraz \(\epsilon = 10^{-4}\).
+    \subsection{Rozwiązanie}
+     \large Aby rozwiązać powyższe zadanie, należało napisać program testujący wykorzystujący funkcję \newline
+     \texttt{function mbisekcji(f::Function, a::Float64, b::Float64, delta::Float64, epsilon::Float64)}. \newline
+     Nastepnie należało wykonać, przekształcenie powyższych równań do następującej postaci: \newline
+     \[e^x = 3x \iff e^x - 3x = 0\] \newline
+     Aby wyznaczyć przedział początkowy posłużyłem się programem \texttt{GeoGebra}, z poniższego wykresu wynika, że nasze funkcje przecinają się w dwóch miejscach.
+     Pierwsze rozwiązanie zawiera się w przedziale \([0.0, 1.0]\), natomiast drugie w \([1.0, 2.0]\), przybliżone wartości miejsc zerowych to \(x \approx 0.619061\) oraz \(x \approx 1.51213\). \newline
+     \newline
+     \includegraphics[width=100mm]{3xex.png}
+    \subsection{Wyniki}
+    \large Poniższa tabela zawiera wyniki przeprowadzonych doświadczeń.
+    \begin{table}[h!]
+        \centering
+        \begin{tabular}{||c c c c||} 
+        \hline
+        \textbf{przedział} & \textbf{x} & \textbf{f(x)} & \textbf{iteracje} \\ [0.5ex]
+        \hline\hline
+         \([0.0, 1.0]\) & 0.619140625 & -9.066320343276146e-5 & 9 \\
+         \([1.0, 2.0]\) & 1.5120849609375 & -7.618578602741621e-5 & 13 \\
+        \hline
+        \end{tabular}
+        \caption{Zadanie 5}
+        \label{table:2}
+    \end{table}
+
+    \subsection{Wnioski}
+    \large Porównując wartości otrzymane z metody bisekcji oraz wartości obliczone przy pomocy \texttt{Wolfram Alpha}, możemy 
+     stwierdzić, że metoda bisekcji daje wiarygone i jak najbardziej zadawalające wyniki dla naszego przypadku. Niemniej jednak, należy
+     zwrócić uwagę na dość istotny szczegół, mianowicie jakość wyników końcowych oraz liczba iteracji jest mocno uzależniona od przedziału początkowego.
+
+    \section{Zadanie 6}
+    \subsection{Opis problemu}
+    \large W zadaniu szóstym, należy znaleźć miejsca zerowe funkcji \(f_{1}(x) = e^{1-x} - 1\) oraz \(f_{2}(x) = xe^{-x}\), za pomocą
+     metod bisekcji, Newtona i siecznych. Kolejnym wymaganiem naszego zadania jest, zastosowanie następujących dokładności obliczeń \(\delta = 10^{-5}\), \(\epsilon = 10^{-5}\) oraz 
+     dobranie odpowiednich przedziałów i punktów początkowych.    
+     Następnie jesteśmy proszeni o sprawdzenie, co się stanie w metodzie Newtona dla \(f_{1}(x) = e^{1-x} - 1\), gdy wybierzemy \(x_{0} \in (1, \infty]\), 
+     a dla \(f_{2}(x) = xe^{-x}\) wybierzemy \(x_{0} > 1\). 
+    \subsection{Rozwiązanie}
+    \large Rozwiązanie polega na zaimplementowaniu programu testującego, który dla \(f_{1}\), \(f_{2}\), danych przedziałów i punktów początkowych, oraz podanej dokładności obliczeń wyznaczy miejsca zerowe funkcji.
+     Aby dobrać odpowiednie punkty oraz przedziały początkowe, posłużyłem się programem \texttt{GeoGebra}. \newline
+     \newline
+     \includegraphics[width=100mm]{ee.png} \newline
+     \newline
+     Na podstawie wykresu z pewnością możemy stwierdzić, że miejsce zerowe funkcji \(f_{1}\) (wykres zielony) zawiera się w przedziale \([0.0, 2.0]\), 
+     natomiast miejsce zerowe \(f_{2}\) (wykres niebieski) zawiera się w przedziale \([-1.0, 1.0]\). Możemy z dużym prawdopodobieństwem założyć, 
+     że nasze pierwiastki znajdują się dokładnie w połowie powyższych przedziałów. Aby lepiej zaobserwować zachowanie naszym algorytmów
+     należy wybrać nieco inny przedział, gdyż przykładowo dla przedziału \([0.0, 2.0]\) w metodzie bisekcji najprawdopodobniej już pierwsza iteracja zwróci nam poprawny wynik. \newline
+     \newline
+     Wybrane przedziały oraz punkty początkowe przedstawiam w poniższej tabeli. 
+
+     \begin{table}[h!]
+        \centering
+        \begin{tabular}{||c c c|} 
+        \hline
+        \textbf{algorytm} & \textbf{funkcja} & \textbf{parametry} \\ [0.5ex]
+        \hline\hline
+         bisekcji & \(f_{1}\) & \([0.5, 2.0]\) \\
+         bisekcji & \(f_{2}\) &  \([-1.5, 0.5]\) \\
+         Newtona & \(f_{1}\) & \(x_{0}=0\) \\
+         Newtona & \(f_{2}\) & \(x_{0}=-1\) \\
+         siecznych & \(f_{1}\) & \(x_{0}=0.5, x_{1}=2.0\)\\
+         siecznych & \(f_{2}\) & \(x_{0}=-1.5, x_{1}=0.5\) \\
+        \hline
+        \end{tabular}
+        \caption{przedziały oraz punkty początkowe}
+        \label{table:3}
+    \end{table} 
+    \subsection{Wyniki}
+    \large Wyniki z przeprowadzonych doświadczeń przedstawiam w poniższych tabelach. \newline
+    \begin{table}[h!]
+        \centering
+        \begin{tabular}{||c c c c c||} 
+        \hline
+        \textbf{algorytm} & \textbf{parametry} & \textbf{x} & \textbf{f(x)} & \textbf{iteracje} \\ [0.5ex]
+        \hline\hline
+         bisekcji & \([0.5, 2.0]\) & 0.9999923706054688 & 7.629423635080457e-6 & 16 \\
+         Newtona & \(x_{0}=0\) & 0.9999984358892101 & 1.5641120130194253e-6 & 4 \\
+         siecznych & \(x_{0}=0.5, x_{1}=2.0\) & 1.000000014307199 & -1.4307198870078253e-8 & 6 \\
+        \hline
+        \end{tabular}
+        \caption{funkcja \(f_{1}(x)= e^{1-x} - 1\)}
+        \label{table:1}
+    \end{table} 
+
+    \begin{table}[h!]
+        \centering
+        \begin{tabular}{||c c c c c||} 
+        \hline
+        \textbf{algorytm} & \textbf{parametry} & \textbf{x} & \textbf{f(x)} & \textbf{iteracje} \\ [0.5ex]
+        \hline\hline
+         bisekcji & \([-1.5, 0.5]\) & 0.0 & 0.0 & 2 \\
+         Newtona & \(x_{0}=-1\) & -3.0642493416461764e-7 & -3.0642502806087233e-7 & 5 \\
+         siecznych & \(x_{0}=-1.5, x_{1}=0.5\) & 1.7791419742860986e-8 & 1.779141942632637e-8 & 8 \\
+        \hline
+        \end{tabular}
+        \caption{funkcja \(f_{2}(x)= xe^{-x}\)}
+        \label{table:1}
+    \end{table} 
+
+    \subsection{Wnioski}
+    \large Z powyższych wyników, możemy potwierdzić wcześniejsze przypuszczenia dotyczące wartości pierwiastków równań \(f_{1}\) i \(f_{2}\).
+     W przypadku \(f_{1}\) jest to \(x=1\), a dla \(f_{2}\) mamy \(x=0\). Najbardziej uwidaczniającą się obserwacją jest to, że obcięcie przedziału \([0.0, 2.0]\) do \([0.5, 2.0]\)
+     dla metody bisekcji, poskutkowało zwiększeniem liczby iteracji potrzebnych do wyznaczenia zera funkcji \(f_{1}\).
+     Dla funkcji \(f_{2}\) w metodzie bisekcji, zastosowaliśmy przedział \([-1.5, 0.5]\), którego środkiem jest \(0\). Zatem nie powinien dziwić nas fakt, iż
+     metoda bisekcji już po dwóch iteracjach zwraca poprawny wynik. Kolejny raz otrzymane wyniki potwierdzają fakt, iż czas potrzebny na wyznaczenie pierwiastków metodą bisekcji jest uzależniony od wyboru przedziału początkowego.
+     Jeśli chodzi o resztę metod, to można powiedzieć, że wyniki są zgodne z naszymi oczekiwaniami. 
+     Pod warunkiem, że środkiem wybranego przez nas przedziału początkowego nie jest pierwiastek danego równania, należy się spodziewać, że metoda Newtona i siecznych dadzą wynik po mniejszej liczbie iteracji niż metoda połowienia przedziału (bisekcji). Zgodnie z poleceniem, należało jeszcze sprawdzić co się stanie w metodzie Newtona, gdy dla \(f_{1}\) wybierzemy \(x_{0} \in (1, \infty]\), oraz dla \(f_{2}\),
+     \(x_{0} > 1\). W moim przypadku wybrałem \(x_{0} = 50\), przy próbie wykonania obliczeń dla funkcji
+     \(f_{1}\) otrzymałem komunikat o błędzie, natomiast dla \(f_{2}\) wynikiem jest \(x=50\), wtedy wartość funkcji dla tego argumentu jest równa \(f_{2}(50) = 9.643749239819589e-21\). Generalnie rzecz biorąc wartość otrzymana dla \(f_{2}(50)\) jest bliższa zeru niż wartość \(f_{2}\), którą wyznaczyliśmy prowadząc obliczenia dla punktu początkowego \(x_{0} =-1.0\). W tym konkretnym przypadku, metoda Newtona 
+     wskazuje liczbę \(50\) jako pierwiastek równania \(f_{2}\), jednak nie jest to prawda. Wykres \(f_{2}\) nie pozostawia złudzeń i jednoznacznie wskazuje na to co odpowiada, za powyższe nieścisłości. 
+     Granica \(\lim_{x \to \infty}f_{2}(x) = 0\), zatem dla \(x_{0} \in (1, \infty]\) funkcja jest zbieżna do zera, a wartości bliskie zera są błędnie interpretowane jako miejsca przecięcia z osią OX. 
+     Natomiast dla punktu początkowego \(x_{0}=1\), metoda Newtona zwraca komunikat o błędzie.
+     Powodem takiego obrotu spraw jest to, że wartość pochodnej \(f'_{2}(x) = -e^{-x}(x-1)\) 
+     w punkcie \(x_{0} = 1\) wynosi \(f'_{2}(1) = 0\), co jest jednoznaczne z tym że styczna leży na osi OX.
+    \end{center}
+    \begin{thebibliography}{100}
+        \bibitem{Kincaid} D. Kincaid, W. Cheney, Analiza numeryczna, Wydawnictwa Naukowo-Techniczne, Warszawa 2006. ISBN 83-204-3078-X
+    \end{thebibliography}
+
+\end{document}
