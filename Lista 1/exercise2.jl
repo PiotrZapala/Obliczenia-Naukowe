@@ -1,3 +1,5 @@
+#Autor: Piotr Zapała 2023
+
 function kahanEps(type)
     return type(3) * (type(4/3) - one(type)) - one(type)
 end

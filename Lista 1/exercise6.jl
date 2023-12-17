@@ -1,3 +1,5 @@
+#Autor: Piotr Zapała 2023
+
 function f(x)
     sqrt(x^2 + 1.) - 1.
 end

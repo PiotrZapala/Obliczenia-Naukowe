@@ -1,3 +1,5 @@
+#Autor: Piotr Zapała 2023
+
 function example1(x, y, type)
     sum = type(0)
     for i in (1:length(x))
@@ -67,7 +69,6 @@ function example4(x, y, type)
 
     return positive + negative
 end
-
 
 
 function main()

@@ -1,3 +1,5 @@
+#Autor: Piotr Zapała 2023
+
 function machEps(type)
     epsilon = one(type)
     while one(type) + epsilon / 2 != one(type)

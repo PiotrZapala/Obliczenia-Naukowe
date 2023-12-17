@@ -1,3 +1,5 @@
+#Autor: Piotr Zapała 2023
+
 function example1()
     a = one(Float64)
     while nextfloat(a) * (one(Float64)/nextfloat(a)) == one(Float64) && a < 2
