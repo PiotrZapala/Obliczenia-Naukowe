@@ -25,7 +25,7 @@
 
 \title{Sprawozdanie 2 Obliczenia Naukowe}
 \author{Piotr Zapała}
-\date{Novemaber 2022}
+\date{November 2023}
 \begin{document}
 \maketitle
 \graphicspath{ {/Users/piotrzapala/JPG}{/Users/piotrzapala/JPG} }
@@ -72,10 +72,10 @@
     \hline
     \textbf{type} & \texttt{Float32} & \texttt{Float64} \\ [0.5ex]
     \hline\hline
-    \textbf{example1} & -0.49999443f0 & -5.0134667188046684e-5 \\ 
-    \textbf{example2} & -0.4543457f0 & -5.013464760850184e-5 \\ 
-    \textbf{example3} & -0.5f0 & -5.013449117541313e-5 \\ 
-    \textbf{example4} & -0.5f0 & -5.013495683670044e-5 \\ 
+    \textbf{example1} & -0.4999443 & 1.0251881368296672e-10 \\ 
+    \textbf{example2} & -0.4543457 & -1.5643308870494366e-10 \\ 
+    \textbf{example3} & -0.5 & 0.0 \\ 
+    \textbf{example4} & -0.5 & 0.0 \\ 
     \hline
     \end{tabular}
     \caption{iloczyn skalarny.}
@@ -88,10 +88,10 @@
     \hline
     \textbf{type} & \texttt{Float32} & \texttt{Float64} \\ [0.5ex]
     \hline\hline
-    \textbf{example1} & -0.49999443f0 & -0.004346477509481865 \\ 
-    \textbf{example2} & -0.4543457f0 & -0.0043464774898893666 \\ 
-    \textbf{example3} & -0.5f0 & -0.004346477333456278 \\ 
-    \textbf{example4} & -0.5f0 & --0.004346477799117565 \\ 
+    \textbf{example1} & -0.4999443 & -0.004296342739891585 \\ 
+    \textbf{example2} & -0.4543457 & -0.004296342998713953 \\ 
+    \textbf{example3} & -0.5 & -0.004296342842280865 \\ 
+    \textbf{example4} & -0.5 & -0.004296342842280865 \\ 
     \hline
     \end{tabular}
     \caption{iloczyn skalarny z modyfikacją.}
@@ -99,12 +99,14 @@
     \end{table}
     \newpage
     \subsection{Wnioski}
-    \large Analizując powyższe przykłady możemy zauważyć, iż wartości wyliczonych iloczynów skalarnych dla arytmetyki 
-     \texttt{Float32} nie uległy zmianie. Natomiast sytuacja w przypadku \texttt{Float64} wygląda zgoła inaczej, na co jednoznacznie wskazują wyniki.
-      Zatem w przypadku arytmetyki o większej precyzji, mamy widoczny wpływ naszej na pozór nieznaczącej modyfikacji.
-      W arytmetyce \texttt{Float32} ze względu na mniejszy zakres mantysy, wprowadzone zmiany nie wpływają na wynik końcowy.
-      \texttt{Float64} jest mniej pobłażliwy pod tym względem i początkowa modyfikacja pozostaje w trakcie obliczeń w zakresie jej mantysy.
-      Możemy stąd wywnioskować, iż zadanie to jest źle uwarunkowane i bardzo ciężko oczekiwać poprawnych wyników w naszym przypadku.
+    \large Analizując powyższe wyniki można łatwo zauważyć, że nie zmieniły się dla \texttt{Float32} względem zadania 5 z listy 1. Jest to spowodowane niewielką precyzją arytmetyki. 
+     Porównując z arytmetyką \texttt{Float64} można dojść do wniosku, że pomimo nie wprowadzenia zmian w algorytmach struktura \texttt{Float32} dała zgoła inne wyniki niż \texttt{Float64}.
+     Tutaj niewielka zmiana rzutowała na wynik iloczynu skalarnego bardzo mocno. 
+     Do rozwiązywania takich zadań należy używać maksymalnej precyzji. 
+     Zadanie jest źle uwarunkowane, małe decyzje w danych wejściowych powodują większe zaburzenia. 
+     Wgłębiając się bardziej w strukturę problemu błędu możemy dojść do wniosku, że modyfikacja danych wejściowych o najmniejszą cyfrę znaczącą w tym wypadku rzędu \(10^{-10}\) jest inaczej zapamiętywana przez różne standardy.
+     Właśnie ze względu na różnicę liczby bitów przeznaczonych na zapamiętanie mantysy. Mamy sytuację, w której \texttt{Float32} nie widzi różnicy bo wszystkie zmiany zachodzą poza zakresem mantysy.
+     Zaś \texttt{Float64} ma większą precyzję, większą liczbę bitów na zapamiętanie mantysy co za tym idzie obejmuje swoim obszarem mantysy zmiany, co widać w wynikach.
 
     \section{Zadanie 2}
     \subsection{Opis problemu}
@@ -377,37 +379,175 @@
     \end{enumerate}
     \newpage
     \subsection{Rozwiązanie}
-    \large Rozwiązanie polega na obliczaniu kolejnych wartości \(x_{n+1}\) w pętli.
-    \subsection{Wyniki}
-    
-    \begin{table}[h!]
+        \begin{table}[h]
+        \centering
+        \begin{tabular}{|c|c|c|c|}
+        \hline
+        $n$ & $x_0=1$ & $x_0=2$ & $x_0 = 1.99999999999999$ \\
+        \hline
+        1 & -1.0 & 2.0 & 1.99999999999996 \\
+        2 & -1.0 & 2.0 & 1.9999999999998401 \\
+        3 & -1.0 & 2.0 & 1.9999999999993605 \\
+        4 & -1.0 & 2.0 & 1.999999999997442 \\
+        5 & -1.0 & 2.0 & 1.9999999999897682 \\
+        6 & -1.0 & 2.0 & 1.9999999999590727 \\
+        7 & -1.0 & 2.0 & 1.999999999836291 \\
+        8 & -1.0 & 2.0 & 1.9999999993451638 \\
+        9 & -1.0 & 2.0 & 1.9999999973806553 \\
+        10 & -1.0 & 2.0 & 1.999999989522621 \\
+        11 & -1.0 & 2.0 & 1.9999999580904841 \\
+        12 & -1.0 & 2.0 & 1.9999998323619383 \\
+        13 & -1.0 & 2.0 & 1.9999993294477814 \\
+        14 & -1.0 & 2.0 & 1.9999973177915749 \\
+        15 & -1.0 & 2.0 & 1.9999892711734937 \\
+        16 & -1.0 & 2.0 & 1.9999570848090826 \\
+        17 & -1.0 & 2.0 & 1.999828341078044 \\
+        18 & -1.0 & 2.0 & 1.9993133937789613 \\
+        19 & -1.0 & 2.0 & 1.9972540465439481 \\
+        20 & -1.0 & 2.0 & 1.9890237264361752 \\
+        21 & -1.0 & 2.0 & 1.9562153843260486 \\
+        22 & -1.0 & 2.0 & 1.82677862987391 \\
+        23 & -1.0 & 2.0 & 1.3371201625639997 \\
+        24 & -1.0 & 2.0 & -0.21210967086482313 \\
+        25 & -1.0 & 2.0 & -1.9550094875256163 \\
+        26 & -1.0 & 2.0 & 1.822062096315173 \\
+        27 & -1.0 & 2.0 & 1.319910282828443 \\
+        28 & -1.0 & 2.0 & -0.2578368452837396 \\
+        29 & -1.0 & 2.0 & -1.9335201612141288 \\
+        30 & -1.0 & 2.0 & 1.7385002138215109 \\
+        31 & -1.0 & 2.0 & 1.0223829934574389 \\
+        32 & -1.0 & 2.0 & -0.9547330146890065 \\
+        33 & -1.0 & 2.0 & -1.0884848706628412 \\
+        34 & -1.0 & 2.0 & -0.8152006863380978 \\
+        35 & -1.0 & 2.0 & -1.3354478409938944 \\
+        36 & -1.0 & 2.0 & -0.21657906398474625 \\
+        37 & -1.0 & 2.0 & -1.953093509043491 \\
+        38 & -1.0 & 2.0 & 1.8145742550678174 \\
+        39 & -1.0 & 2.0 & 1.2926797271549244 \\
+        40 & -1.0 & 2.0 & -0.3289791230026702 \\
+        \hline
+    \end{tabular}
+    \caption{dla $c=-2$}
+    \end{table}
+    \newpage
+
+    \begin{table}[h]
     \centering
-    \begin{tabular}{||c c c||} 
+    \begin{tabular}{|c|c|c|c|c|}
     \hline
-    \textbf{c} & \textbf{\(x_{0}\)}& \textbf{result} \\ [0.5ex]
-    \hline\hline
-    -2 & 1 & -1.0 \\
-    -2 & 2 & 2.0 \\
-    -2 & 1.99999999999999 & -0.3289791230026702 \\
-    -1 & 1 & -1.0 \\
-    -1 & 1 & -1.0 \\
-    -1 & 0.75 & -1.0 \\
-    -1 & 0.25 & 0.0 \\
+    $n$ & $x_0=1$ & $x_0=2$ & $x_0=0.75 $ & $x_0=0.25$ \\
+    \hline
+    1 & 0.0 & 0.0 & -0.4375 & -0.9375 \\
+    2 & -1.0 & -1.0 & -0.80859375 & -0.12109375 \\
+    3 & 0.0 & 0.0 & -0.3461761474609375 & -0.9853363037109375 \\
+    4 & -1.0 & -1.0 & -0.8801620749291033 & -0.029112368589267135 \\
+    5 & 0.0 & 0.0 & -0.2253147218564956 & -0.9991524699951226 \\
+    6 & -1.0 & -1.0 & -0.9492332761147301 & -0.0016943417026455965 \\
+    7 & 0.0 & 0.0 & -0.0989561875164966 & -0.9999971292061947 \\
+    8 & -1.0 & -1.0 & -0.9902076729521999 & -5.741579369278327e-6 \\
+    9 & 0.0 & 0.0 & -0.01948876442658909 & -0.9999999999670343 \\
+    10 & -1.0 & -1.0 & -0.999620188061125 & -6.593148249578462e-11 \\
+    11 & 0.0 & 0.0 & -0.0007594796206411569 & -1.0 \\
+    12 & -1.0 & -1.0 & -0.9999994231907058 & 0.0 \\
+    13 & 0.0 & 0.0 & -1.1536182557003727e-6 & -1.0 \\
+    14 & -1.0 & -1.0 & -0.9999999999986692 & 0.0 \\
+    15 & 0.0 & 0.0 & -2.6616486792363503e-12 & -1.0 \\
+    16 & -1.0 & -1.0 & -1.0 & 0.0 \\
+    17 & 0.0 & 0.0 & 0.0 & -1.0 \\
+    18 & -1.0 & -1.0 & -1.0 & 0.0 \\
+    19 & 0.0 & 0.0 & 0.0 & -1.0 \\
+    20 & -1.0 & -1.0 & -1.0 & 0.0 \\
+    21 & 0.0 & 0.0 & 0.0 & -1.0 \\
+    22 & -1.0 & -1.0 & -1.0 & 0.0 \\
+    23 & 0.0 & 0.0 & 0.0 & -1.0 \\
+    24 & -1.0 & -1.0 & -1.0 & 0.0 \\
+    25 & 0.0 & 0.0 & 0.0 & -1.0 \\
+    26 & -1.0 & -1.0 & -1.0 & 0.0 \\
+    27 & 0.0 & 0.0 & 0.0 & -1.0 \\
+    28 & -1.0 & -1.0 & -1.0 & 0.0 \\
+    29 & 0.0 & 0.0 & 0.0 & -1.0 \\
+    30 & -1.0 & -1.0 & -1.0 & 0.0 \\
+    31 & 0.0 & 0.0 & 0.0 & -1.0 \\
+    32 & -1.0 & -1.0 & -1.0 & 0.0 \\
+    33 & 0.0 & 0.0 & 0.0 & -1.0 \\
+    34 & -1.0 & -1.0 & -1.0 & 0.0 \\
+    35 & 0.0 & 0.0 & 0.0 & -1.0 \\
+    36 & -1.0 & -1.0 & -1.0 & 0.0 \\
+    37 & 0.0 & 0.0 & 0.0 & -1.0 \\
+    38 & -1.0 & -1.0 & -1.0 & 0.0 \\
+    39 & 0.0 & 0.0 & 0.0 & -1.0 \\
+    40 & -1.0 & -1.0 & -1.0 & 0.0 \\
     \hline
     \end{tabular}
-    \caption{}
-    \label{table:9}
-    \end{table} 
+    \caption{dla $c=-1$}
+    \end{table}
+    \subsection{Wyniki}
+    \large Wyznaczam iterację graficzną. Jak to zrobić? \\
+    Do przeprowadzenia iteracji trzeba najpierw wyznaczyć wykres funkcji \(y - ax(1 - x)\) oraz dwusieczną (przekątną kwadratu). 
+    Następnie należy zaznaczyć punkt \(x_{q}\) na osi \(x\) i przeprowadzić linię pionową wychodzącą z punktu \(x_{0}\),
+    a kończącą się w momencie przecięcia wykresu funkcji. Od tego punktu zaczynamy rysować linię poziomą do punktu przecięcia z przekątną,
+    a stąd znowu linię pionową do punktu przecięcia z wykresem itd.
+    \includegraphics[width=\textwidth]{w1.png}
+    \begin{center}
+        \(x_{n+1}:=x_{n}^2-1\) dla \(x_{0}=-1\) \\
+        Jak widzimy dla \(-1\) widać zacyklenie się procesu.
+        Jest one wręcz natychmiastowe. Oznacza to, że jest stabilne.
+    \end{center}
+    \newpage
+    \includegraphics[width=\textwidth]{w2.png}
+    \begin{center}
+        \(x_{n+1}:=x_{n}^2-1\) dla \(x_{0}=0.25\) \\
+        Dla \(0.25\) powoli widać zacyklanie się procesu. Tzn. powolną stabilizację.
+    \end{center}
+    \newpage
+    \includegraphics[width=\textwidth]{w3.png}
+    \begin{center}
+        \(x_{n+1}:=x_{n}^2-1\) dla \(x_{0}=0.75\) \\
+        Jeszcze mocniejsze zacyklanie. Nieskończony cykl.
+    \end{center}
+    \newpage
+    \includegraphics[width=\textwidth]{w4.png}
+    \begin{center}
+        \(x_{n+1}:=x_{n}^2-1\) dla \(x_{0}=1\) \\
+        Jak widzimy dla 1 widać zacyklenie się procesu.
+        Jest one wręcz natychmiastowe. Oznacza to, że jest stabilne.
+    \end{center}
+    \newpage
+    \includegraphics[width=\textwidth]{w5.png}
+    \begin{center}
+        \(x_{n+1}:=x_{n}^2-2\) dla \(x_{0}=1.9999999999999\) \\
+        Patrząc na uzyskany wykres widzimy, że proces wyraźnie nie zatrzymuje się.
+        Zamiast uporządkowanego zachowania w granicy stopniowo 
+        (w kolejnych iteracjach jest mocniej zapełniony) zapełnia on (powoli) całą dostępną przestrzeń.
+        Zjawisko to, nazywane mieszaniem, jest wskaźnikiem niestabilnego stanu systemu.
+        Spoglądając na dane z tabeli znajdziemy potwierdze- nie naszej graficznej reprezentacji.
+    \end{center}
+    \newpage
+    \includegraphics[width=\textwidth]{w6.png}
+    \begin{center}
+        \(x_{n+1}:=x_{n}^2-2\) dla \(x_{0}=1\) \\
+        Zielone odcinki rysują się do punktów stałych w funkcji.
+         Patrząc na tabelę możemy zinterpretować to jako brak zmian w kolejnych wartościach ciągu.
+    \end{center}
+    \newpage
+    \includegraphics[width=\textwidth]{w7.png}
+    \begin{center}
+        \(x_{n+1}:=x_{n}^2-2\) dla \(x_{0}=2\) \\ 
+        Tak samo jak w poprzednim przykładzie.
+    \end{center}
 
     \subsection{Wnioski}
-    \includegraphics[width=\textwidth]{w1.png}
-    \includegraphics[width=\textwidth]{w2.png}
-    \includegraphics[width=\textwidth]{w3.png}
-    \includegraphics[width=\textwidth]{w4.png}
-    \includegraphics[width=\textwidth]{w5.png}
-    \includegraphics[width=\textwidth]{w6.png}
-    \includegraphics[width=\textwidth]{w7.png}
 
+    Otrzymane wyniki dla całkowitych wartości \(c\) i \(x_{0}\) nie zaskakują i są zgodne z intuicją.
+    Przy liczbach zmiennoprzecinkowych takich jak np. \(x_{0} = 0.25\) i \(x_{0} = 0.75\) wartości zbiegają do całkowitych przez pewien czas,
+    a potem po 40 iteracjach zwracają taką wartość, że jej zachowanie wygląda podobnie jakbyśmy przybrali wartości \(x_{0} = 1\) i \(x_{0} = 2\).
+    Przybierając \(x_{0} = 1.99999999999999\) znacząco wpływamy na wyniki po 40 iteracjach.
+    Wtedy mamy sytuację, że zamiast oczekiwanych wyników gdzie powinniśmy otrzymywać wyniki oddalone od zera to się do niego przybliża.
+    Jest to całkowita rozbieżność w wynikach, które oczekujemy, a wynikami otrzymywanymi.
+    Reasumując, gdy dane są wartościami całkowitymi ciągi mają poprawne wartości. 
+    W przypadku, gdy dane są ułamkami dla małych \(x\) rekurencja wyznacza poprawne wartości, ale jak widać na wykresach od pewnego momentu te wartości są zaokrąglane do wartości całkowitych.
+    Najpierw wartości są całkowite i od pewnego momentu liczby przestają być zaokrąglane do wartości całkowitych. Wyznaczanie kolejnych wyrazów ciągów rekurencyjnych może mieć różną stabilność.
+    Zależy to od parametrów, które ustawimy. Całkowicie stabilne to np. \(x_{0} = 1\), stabilizujące się np. \(x_{0} = 0.75\), \(x_{0} = 0.25\), niestabilne np. \(x_{0} \approx 1.99\).
     
     \end{center}
 

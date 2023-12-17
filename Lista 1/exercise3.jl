@@ -1,3 +1,5 @@
+#Autor: Piotr Zapała 2023
+
 function check(delta)
     for k in 1:10
         println(bitstring(Float64(1 + k*delta)))

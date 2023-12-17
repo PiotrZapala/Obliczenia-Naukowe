@@ -1,3 +1,5 @@
+#Autor: Piotr Zapała 2023
+
 function f(x)
     sin(x) + cos(3*x)
 end

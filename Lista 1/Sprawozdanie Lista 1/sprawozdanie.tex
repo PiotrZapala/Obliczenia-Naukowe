@@ -26,7 +26,7 @@
 
 \title{Sprawozdanie Obliczenia Naukowe}
 \author{Piotr Zapała}
-\date{October 2022}
+\date{October 2023}
 \begin{document}
 \maketitle
 
@@ -36,16 +36,16 @@
     \section{Zadanie 1}
     \subsection{Opis problemu}
     \large Pierwsze zadanie polega na iteracyjnym wyznaczeniu epsilonów maszynowych
-     dla wszystkich typów zmiennopozycyjnych zgodnych ze standardem IEE 754, następnie należy
+     dla wszystkich typów zmiennopozycyjnych zgodnych ze standardem \textbf{IEEE 754}, następnie należy
      porównać z wartościami zwracanymi przez funkcje: \texttt{eps(Float16), eps(Float32), eps(Float64)} 
      oraz z danymi zawartymi w pliku \texttt{float.h}.\vspace*{2mm}
 
      Następnie musimy wyznaczyć liczbę maszynową \textit{eta}
-     dla wszystkich typów zmiennopozycyjnych zgodnych ze standardem IEE 754, następnie należy
+     dla wszystkich typów zmiennopozycyjnych zgodnych ze standardem \textbf{IEEE 754}, następnie należy
      porównać z wartościami zwracanymi przez funkcje: \texttt{nextfloat(Float16(0.0)), nextfloat(Float32(0.0)), nextfloat(Float64(0.0))}.\vspace*{2mm}
 
      Ostatnią rzeczą o którą jesteśmy proszeni w zadaniu pierwszym, jest iteracyjne wyznaczenie liczby (MAX)
-     dla wszystkich typów zmiennopozycyjnych zgodnych ze standardem IEE 754, następnie należy
+     dla wszystkich typów zmiennopozycyjnych zgodnych ze standardem \textbf{IEEE 754}, następnie należy
      porównać z wartościami zwracanymi przez funkcje: \texttt{floatmax(Float16), floatmax(Float32), floatmax(Float64)} 
      oraz z danymi zawartymi w pliku \texttt{float.h} lub danymi z wykładu.\vspace*{2mm}
     \subsection{Rozwiązanie}
@@ -84,23 +84,25 @@
     \caption{machine epsilon.}
     \label{table:1}
     \end{table}
-    \large Precyzję arytmetki zwyczajowo oznaczamy przez \(\epsilon\), wyraża się ją wzorem \( \displaystyle \epsilon  = \frac{1}{2}*\beta^{1-t} \) , gdzie \(\displaystyle t \in [\frac{1}{\beta}, 1)\).\newpage
+    \large W ogólnym modelu precyzję arytmetki zwyczajowo oznaczamy przez \(\epsilon\), która wyraża się wzorem \newline
+     \( \displaystyle \epsilon  = \frac{1}{2}*\beta^{1-t} \) , gdzie \(\displaystyle t \in [\frac{1}{\beta}, 1)\).\newpage
+     Natomiast w standardzie \textbf{IEEE 754}, precyzja danej arytmetyki wynosi \( \displaystyle \epsilon  = 2^{-t} \).
     \begin{table}[h!]
     \centering
     \begin{tabular}{||c c c c||} 
     \hline
     \textbf{type} & \texttt{Float16} & \texttt{Float32} & \texttt{Float64} \\ [0.5ex]
     \hline\hline
-    \textbf{\(\epsilon\)} & \(2^{-10}\) & \(2^{-23}\) & \(2^{-52}\)  \\
-    \textbf{type(\(\epsilon\))} & 0.000977 & 1.1920929f-7 & 2.220446049250313e-16 \\
+    \textbf{\(\epsilon\)} & \(2^{-11}\) & \(2^{-24}\) & \(2^{-53}\)  \\
+    \textbf{type(\(\epsilon\))} & 0.0004883 & 5.9604645f-8 & 1.1102230246251565e-16 \\
     \textbf{eps(type)} & 0.000977 & 1.1920929f-7 & 2.220446049250313e-16 \\
     \hline
     \end{tabular}
-    \caption{precyzja arytmetyki.}
+    \caption{precyzja arytmetyki a \texttt{machine epsilon}.}
     \label{table:2}
     \end{table}
 
-    \large Zatem precyzja danej arytmetki jest równa \textbf{eps(type)}.
+    \large Zatem precyzja danej arytmetki w standardzie \textbf{IEEE 754} jest równa \(\frac{1}{2}*\)\texttt{machine epsilon}.
 
     \begin{table}[h!]
     \centering
@@ -114,11 +116,11 @@
     \hline
     \end{tabular}
     \caption{eta.}
-    \label{table:2}
+    \label{table:3}
     \end{table}
     
     \large \(MIN_{sub}\) jest najmniejszą dla danej arytmetyki liczbą w postaci nieznormalizowanej. \newline
-    \(\displaystyle MIN_{sub} = 2^{1-t}*2^{c_{min}}\)
+    \(\displaystyle MIN_{sub} = 2^{1-t}*2^{c_{min}}\),
     \(t\) jest liczbą cyfr mantysy, przy czym \(t \in [1,2)\), \newline a \(c_{min} = -2^{d-1} + 2\), gdzie \(d\) oznacza liczbę bitów mantysy.
     \begin{table}[h!]
     \centering
@@ -133,7 +135,7 @@
     \hline
     \end{tabular}
     \caption{\(MIN_{sub}\).}
-    \label{table:3}
+    \label{table:4}
     \end{table}
     
     \large Zatem \(MIN_{sub}\) jest równe liczbie \textbf{eta(type)} w danej arytmetyce. \newline
@@ -153,7 +155,7 @@
     \hline
     \end{tabular}
     \caption{\(MIN_{nor}\).}
-    \label{table:3}
+    \label{table:5}
     \end{table}
 
     \large Zatem \(MIN_{nor}\) jest równe \textbf{floatmin(type)} w danej arytmetyce. \newline
@@ -170,11 +172,11 @@
     \hline
     \end{tabular}
     \caption{float max}
-    \label{table:4}
+    \label{table:6}
     \end{table}
     
     \subsection{Wnioski}
-    \large Wyniki przedstawione w tabelach, jednoznacznie wskazują na to, że standard IEE 754 ma pewne ogarniczenia.
+    \large Wyniki przedstawione w tabelach, jednoznacznie wskazują na to, że standard \textbf{IEEE 754} ma pewne ogarniczenia.
      Wraz ze wzrostem liczby bitów jakie przeznaczamy na zapis danej liczby, pewne niedogodności arytmetyki są mniej zauważalne.
      Zwiększanie liczby bitów, pozwala nam na zwiększanie zakresu liczb na których możemy operować. 
     \section{Zadanie 2}
@@ -195,7 +197,7 @@
      \hline
      \end{tabular}
      \caption{kahan eps.}
-     \label{table:5}
+     \label{table:7}
      \end{table}
     
     \subsection{Wnioski}
@@ -227,7 +229,7 @@
     \hline
     \end{tabular}
     \caption{przedział [2, 4].}
-    \label{table:5}
+    \label{table:8}
     \end{table}
     \begin{table}[h!]
     \centering
@@ -248,7 +250,7 @@
     \hline
     \end{tabular}
     \caption{przedział [1, 2]}
-    \label{table:5}
+    \label{table:9}
     \end{table}
 
     \begin{table}[h!]
@@ -270,7 +272,7 @@
     \hline
     \end{tabular}
     \caption{przedział [1/2, 1]}
-    \label{table:5}
+    \label{table:10}
     \end{table}
 
     \large Możemy zauważyć, iż gęstość rozmieszenia liczb w przedziale [2, 4] jest dwukrotnie większa niż w przypadku przedziału [1, 2].
@@ -281,7 +283,7 @@
     \section{Zadanie 4}
     \subsection{Opis problemu}
     \large W pierwszym podpunkcie zadania czwartego jesteśmy proszeni o to, aby w arytmetyce \texttt{Float64} \newline
-     zgodnej ze standardem IEE 754 znaleźć taką liczbę \textit{x} w przedziale \(1<x<2\), że \(\textit{x}*(\frac{1}{\textit{x}}) \neq 1\). \newline
+     zgodnej ze standardem \textbf{IEEE 754} znaleźć taką liczbę \textit{x} w przedziale \(1<x<2\), że \(\textit{x}*(\frac{1}{\textit{x}}) \neq 1\). \newline
      Natomiast podpunkt drugi polega na wyznaczeniu najmniejszej takiej liczby.
     \subsection{Rozwiązanie}
     \large W tym zadaniu należy się posłużyć funkcjami \textbf{one(type)}, \textbf{zero(type)} oraz funkcją \textbf{nextfloat(x)}.
@@ -296,7 +298,7 @@
      2. \(x = 1.0e-323\)
     \end{flushleft}
     \subsection{Wnioski}
-    \large Analizując podane przykłady możemy wywnioskować, iż IEE 754 ma ograniczoną
+    \large Analizując podane przykłady możemy wywnioskować, iż \textbf{IEEE 754} ma ograniczoną
      dokładność i nawet bardzo proste operacje mogą dawać fałszywe wyniki.
     \section{Zadanie 5}
     \subsection{Opis problemu}
@@ -343,7 +345,7 @@
     \hline
     \end{tabular}
     \caption{iloczyn skalarny.}
-    \label{table:5}
+    \label{table:11}
     \end{table}
 
     \subsection{Wnioski}
@@ -387,7 +389,7 @@
         \hline
         \end{tabular}
         \caption{porównanie wartości funkcji f i g dla \(x = 8^{-1},8^{-2},8^{-3}\),\ldots.}
-        \label{table:5}
+        \label{table:12}
         \end{table}
         Pomimo równości \(f\) i \(g\), widzimy znaczącą różnicę w otrzymywanych wynikach.
         W tym przypadku jest to spowodowane odejmowaniem we wzorze funkcji \(f\).
@@ -473,7 +475,7 @@
      \hline
      \end{tabular}
      \caption{porównanie wyników dla h.}
-     \label{table:6}
+     \label{table:13}
      \end{table}
      \begin{table}[h!]
      \centering
@@ -538,7 +540,7 @@
      \hline
      \end{tabular}
      \caption{porównanie wyników dla 1 + h.}
-     \label{table:7}
+     \label{table:14}
      \end{table}
 
     \large Najlepsze przybliżenie pochodnej w punkcie \(x_{0} = 1\) otrzymujemy do \(h = 2^{-28}\).
